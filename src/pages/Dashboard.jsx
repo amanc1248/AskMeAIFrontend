@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Paper, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
+import { Container, Paper, TextField, Button, Typography, Box, Card, CardContent, CircularProgress } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import toast from 'react-hot-toast';
 import axios from '../utils/axios';
@@ -10,6 +10,7 @@ function Dashboard() {
   const [answer, setAnswer] = useState('');
   const [shareableLink, setShareableLink] = useState('');
   const userId = localStorage.getItem('userId');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -57,12 +58,15 @@ function Dashboard() {
         return;
       }
 
+      setIsLoading(true);
       const response = await axios.post(`/api/personal-data/ask/${shareableLink.split('/').pop()}`, {
         question: trimmedQuestion
       });
       setAnswer(response.data.answer);
     } catch (error) {
       toast.error('Error getting answer');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -129,16 +133,35 @@ function Dashboard() {
             margin="normal"
             error={question.trim() === '' && question !== ''}
             helperText={question.trim() === '' && question !== '' ? 'Question cannot be empty' : ''}
+            disabled={isLoading}
           />
           <Button
             variant="contained"
             onClick={handleAskQuestion}
             sx={{ mt: 1 }}
-            disabled={!question.trim()}
+            disabled={!question.trim() || isLoading}
           >
-            Ask Question
+            {isLoading ? 'Thinking...' : 'Ask Question'}
           </Button>
-          {answer && (
+
+          {isLoading && (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 2,
+              mt: 3,
+              p: 2,
+              bgcolor: 'background.default',
+              borderRadius: 1,
+            }}>
+              <CircularProgress size={20} />
+              <Typography color="text.secondary">
+                AI is thinking about your question...
+              </Typography>
+            </Box>
+          )}
+
+          {answer && !isLoading && (
             <Card sx={{ mt: 2 }}>
               <CardContent>
                 <Typography variant="body1">{answer}</Typography>
