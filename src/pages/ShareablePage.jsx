@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import { Container, Paper, TextField, Button, Typography, Box, Card, CardContent, Divider, CircularProgress } from '@mui/material';
+import { Container, Paper, TextField, Button, Typography, Box, Card, CardContent, CircularProgress } from '@mui/material';
 import toast from 'react-hot-toast';
 import axios from '../utils/axios';
 
